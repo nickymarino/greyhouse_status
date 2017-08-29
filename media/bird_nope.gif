@@ -1,0 +1,12 @@
+--2017-08-29 16:55:55--  https://media2.giphy.com/media/W5YVAfSttCqre/giphy.gif
+Resolving media2.giphy.com... 151.101.186.2
+Connecting to media2.giphy.com|151.101.186.2|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 58604 (57K) [image/gif]
+Saving to: “giphy.gif.2”
+
+     0K .......... .......... .......... .......... .......... 87% 4.34M 0s
+    50K .......                                               100% 13791G=0.01s
+
+2017-08-29 16:55:55 (4.96 MB/s) - “giphy.gif.2” saved [58604/58604]
+

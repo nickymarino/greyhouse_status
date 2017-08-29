@@ -26,6 +26,8 @@ def get_responses():
 		'Lol nope',
 		'Hell nah',
 		'Hell no',
+		'HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA no',
+		'Bitch you thought',
 		'Maybe? Like 1 or 2?',
 		'*Rolls dice* ...Nope',
 		'Don\'t even bother.',
