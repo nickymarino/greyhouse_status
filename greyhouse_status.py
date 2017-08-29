@@ -43,6 +43,7 @@ def get_responses():
 		'If you\'re willing to throw elbows, tons!',
 		'No seats available until 10pm!',
 		'Current wait time: TBD',
+		'$7 for a cup of coffee, and you can\'t even sit down...',
 	]
 	# Add media as responses
 	responses += get_files_in_folder('./media')
@@ -74,7 +75,7 @@ def send_tweet(string):
 
 def write_to_log(old_log_arr, new_text):
 	# Only keep a limited amount of history in the log
-	num_responses_stored = 3
+	num_responses_stored = 10
 	if len(old_log_arr) >= num_responses_stored:
 		log_data = [new_text] + old_log_arr[0:(num_responses_stored-1)]
 	else:
