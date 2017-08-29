@@ -1,10 +1,7 @@
 import random
 import twitter
 try:
-    from greyhouse_status_keys import CONSUMER_KEY,
-                                      CONSUMER_SECRET,
-                                      ACCESS_TOKEN_KEY,
-                                      ACCESS_TOKEN_SECRET
+    from greyhouse_status_keys import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET
 except ImportError:
     print('Could not get required keys from greyhouse_status_keys.py')
 
@@ -34,14 +31,13 @@ if __name__ == '__main__':
     next_response = random.choice(responses)
     
     # Send tweet
-    print('Sending tweet: {}'.format(next_response))
     api = twitter.Api(consumer_key=CONSUMER_KEY,
                       consumer_secret=CONSUMER_SECRET,
                       access_token_key=ACCESS_TOKEN_KEY,
                       access_token_secret=ACCESS_TOKEN_SECRET)
     try:
         status = api.PostUpdate(next_response)
-        print('Sent. Status: {}'.format(status))
+        print('Tweet "{}" sent at {}'.format(next_response, status.created_at))
     except Exception as ex:
         print('Tweet could not be sent. Error below:\n{}'.format(ex))
 
