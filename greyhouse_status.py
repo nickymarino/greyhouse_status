@@ -1,10 +1,12 @@
 import random
 import twitter
-from boto.s3.connection import S3Connection
-s3 = S3Connection(os.environ['CONSUMER_KEY'], 
-                  os.environ['CONSUMER_SECRET'],
-                  os.environ['ACCESS_TOKEN_KEY'],
-                  os.environ['ACCESS_TOKEN_SECRET'])
+try:
+    from greyhouse_status_keys import CONSUMER_KEY,
+                                      CONSUMER_SECRET,
+                                      ACCESS_TOKEN_KEY,
+                                      ACCESS_TOKEN_SECRET
+except ImportError:
+    print('Could not get required keys from greyhouse_status_keys.py')
 
 if __name__ == '__main__':
     # All possible responses to Tweet
