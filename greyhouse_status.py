@@ -1,21 +1,36 @@
 import random
-import twitter
+import tweepy
 import datetime
+import os
+
+# Validate that keys can be imported
 try:
 	from greyhouse_status_keys import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET
 except ImportError:
 	print('Could not get required keys from greyhouse_status_keys.py')
 
-def send_tweet(text):
-	'''Sends the text as a tweet'''
-	api = twitter.Api(consumer_key=CONSUMER_KEY,
-					  consumer_secret=CONSUMER_SECRET,
-					  access_token_key=ACCESS_TOKEN_KEY,
-					  access_token_secret=ACCESS_TOKEN_SECRET)
+def get_files_in_folder(folder):
+	'''Returns an array of filenames directly under folder'''
+	return [os.path.join(folder, f) for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
+
+def send_tweet(string):
+	'''Sends a tweet with media if the string is a valid file path, sends the string as a tweet otherwise'''
+	auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+	auth.set_access_token(ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET)
+	api = tweepy.API(auth)
+
+	# Validate keys
+	if not api.verify_credentials():
+		raise IOError('Twitter API keys are invalid')
+	
+	# Send tweet
 	try:
-		status = api.PostUpdate(text)
-		print('Tweet "{}" sent at {}'.format(next_response, status.created_at))
-	except Exception as ex:
+		if os.path.isfile(string):
+			status = api.update_with_media(string)
+		else:
+			status = api.update_status(string)
+		print('Tweet "{}" sent at {}'.format(string, status.created_at))
+	except tweepy.TweepError as ex:
 		print('Tweet could not be sent. Error below:\n{}'.format(ex))
 
 def write_to_log(old_log_arr, new_text):
@@ -26,13 +41,13 @@ def write_to_log(old_log_arr, new_text):
 	else:
 		log_data = [new_text] + old_log_arr
 
-	# 
+	# Write to log 
 	with open('greyhouse_status.log', 'w') as out:
 		out.write('# Last three responses (newest first)\n')
 		out.write('\n'.join(log_data))
 
 if __name__ == '__main__':
-	# All possible responses to Tweet
+	# Text responses
 	responses = [
 		'No.',
 		'Nope.',
@@ -58,6 +73,8 @@ if __name__ == '__main__':
 		'No seats available until 10pm!',
 		'Current wait time: TBD',
 	]
+	# Add media as responses
+	responses += get_files_in_folder('./media')
 
 	closed_responses = [
 		'Well there would be seats open, but we\'re closed',
