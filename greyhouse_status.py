@@ -9,6 +9,12 @@ if __name__ == '__main__':
     # All possible responses to Tweet
     responses = ['No.',
                 'Nope.',
+				'Nah fam',
+				'Lol nope',
+				'Hell nah',
+				'Hell no',
+				'Maybe? Like 1 or 2?',
+				'*Rolls dice* ...Nope',
                 'Don\'t even bother.',
                 'Wait there\'s one! ...Oh someone just sat down :/',
                 '-1',

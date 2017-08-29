@@ -1,5 +1,6 @@
 greyhouse_status_keys.py
 greyhouse_status.log
+last_run_result.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
