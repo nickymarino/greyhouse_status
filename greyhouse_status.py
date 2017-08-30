@@ -18,9 +18,11 @@ except ImportError:
 	use_pushover = False
 
 def get_responses():
-	'''Returns all "normal" responses, both text and media'''
+	'''Returns a dictionary of responses, each item an array of one category of responses'''
+	responses = {}
+
 	# Text responses
-	responses = [
+	responses['default'] = [
 		'No.',
 		'Nope.',
 		'Nah fam',
@@ -31,6 +33,7 @@ def get_responses():
 		'HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA no',
 		'Bitch you thought',
 		'You wish',
+		'You\'re gonna get riggity riggity wrecked',
 		'Keep dreaming',
 		'Every table\'s taken, sry bb',
 		'Maybe? Like 1 or 2?',
@@ -51,11 +54,22 @@ def get_responses():
 		'No seats available until 10pm!',
 		'Current wait time: TBD',
 		'$7 for a cup of coffee, and you can\'t even sit down...',
+	] + get_files_in_folder('./media')
+	
+	# Responses when the store is closed
+	responses['closed'] = [
+		'Well there would be seats open, but we\'re closed',
+		'Closed. Rip',
+		'Wait, every single chair is empty?! Oh we\'re closed',
 	]
-	# Add media as responses
-	# Get the path of this file, since running an exterior shell command will look in a different media folder
-	media_folder = './media' #os.path.join(os.path.dirname(os.path.realpath(__file__)), 'media')
-	responses += get_files_in_folder(media_folder)
+
+	# Responses when the store opens
+	responses['opened'] = [
+		'Just opened! Get \'em while they\'re hot!',
+		'Open for business! Seats will be full in about 3 minutes.',
+		'Hurry! We just opened so there\'s about 4 seats left!',
+	]
+
 	return responses
 
 def get_files_in_folder(folder):
@@ -80,7 +94,7 @@ def send_tweet(string):
 			status = api.update_status(string)
 		print('Tweet "{}" sent at {}'.format(string, status.created_at))
 	except tweepy.TweepError as ex:
-		if ex.message[0]['code'] != 187: # Duplicate status/tweet
+		if (hasattr(ex, 'message')) and (ex.message[0]['code'] != 187): # Duplicate status/tweet
 			raise Exception('Tweet "{}" could not be sent. Error below:\n{}'.format(string, ex))
 
 def write_to_log(old_log_arr, new_text):
@@ -97,56 +111,51 @@ def write_to_log(old_log_arr, new_text):
 		out.write('# Previous responses (newest first)\n')
 		out.write('\n'.join(log_data))
 
+def hourly_tweet():
+	'''Tweets every hour the "status" of seats'''
+	tweets = get_responses()
+
+	# Attempt to read history
+	try:
+		with open('greyhouse_status.log', 'r') as history:
+			prev_tweets = [x.strip() for x in history.readlines()[1:]]
+	except:
+		prev_tweets = []
+
+	now = datetime.datetime.now()
+	# Exit if Greyhouse is closed
+	if (now.hour > 22) or (now.hour < 7):
+		print('Greyhouse is closed, and a closed message should have already been sent. Not sending tweet.')
+		exit()
+
+	# Post an opened message at 7am
+	if now.hour == 7:
+		possible_tweets = tweets['opened']
+	# Post a closed message at 10pm
+	elif now.hour == 22:
+		possible_tweets = tweets['closed']
+	# Normal tweet
+	else:
+		# Remove previous tweets from options
+		possible_tweets = tweets['default']
+		for item in prev_tweets:
+			if item in possible_tweets: 
+				possible_tweets.remove(item)
+	
+	# Tweet and log
+	next_tweet = random.choice(possible_tweets)
+	send_tweet(next_tweet)
+	write_to_log(prev_tweets, next_tweet)
+
 if __name__ == '__main__':
 	try:
-		responses = get_responses()
-		opened_responses = [
-			'Just opened! Get \'em while they\'re hot!',
-			'Open for business! Seats will be full in about 3 minutes.',
-			'Hurry! We just opened so there\'s about 4 seats left!',
-		]
-		closed_responses = [
-			'Well there would be seats open, but we\'re closed',
-			'Closed. Rip',
-			'Wait, every single chair is empty?! Oh we\'re closed',
-		]
-
-		# Attempt to read history
-		try:
-			with open('greyhouse_status.log', 'r') as history:
-				prev_responses = [x.strip() for x in history.readlines()[1:]]
-		except:
-			prev_responses = []
-
-		now = datetime.datetime.now()
-		# Exit if Greyhouse is closed
-		if (now.hour > 22) or (now.hour < 7):
-			print('Greyhouse is closed, and a closed message should have already been sent. Not sending tweet.')
-			exit()
-
-		# Post an opened message at 7am
-		if now.hour == 7:
-			next_response = random.choice(opened_responses)
-		# Post a closed message at 10pm
-		elif now.hour == 22:
-			next_response = random.choice(closed_responses)
-		# Normal tweet
-		else:
-			# Remove previous responses from options
-			for item in prev_responses:
-				if item in responses:
-					responses.remove(item)
-			next_response = random.choice(responses)
-		
-		# Tweet and log
-		send_tweet(next_response)
-		write_to_log(prev_responses, next_response)
+		hourly_tweet()
 	except Exception as ex:
 		# Pushover alert if something goes wrong
 		if use_pushover:
 			timestr = time.strftime('%d/%m/%Y %H:%I %p')
 			pushover.init(PUSHOVER_APP_TOKEN)
 			pushover.Client(PUSHOVER_USER).send_message('Error:\n{}'.format(ex),
-														title='greyhouse_status.py error {}'.format(timestr))
+														title='{} error {}'.format(__file__, timestr))
 		# Re-raise the exception for any logs
 		raise ex
