@@ -87,16 +87,23 @@ def write_to_log(old_log_arr, new_text):
 		log_data = [new_text] + old_log_arr
 
 	# Write to log 
-	log_file = 'greyhouse_status.log' #os.path.join(os.path.dirname(os.path.realpath(__file__)), 'greyhouse_status.log')
+	log_file = 'greyhouse_status.log'
 	with open(log_file, 'w') as out:
-		out.write('# Last three responses (newest first)\n')
+		out.write('# Previous responses (newest first)\n')
 		out.write('\n'.join(log_data))
 
 if __name__ == '__main__':
 	try:
 		responses = get_responses()
+		opened_responses = [
+			'Just opened! Get \'em while they\'re hot!',
+			'Open for business! Seats will be full in about 3 minutes.',
+			'Hurry! We just opened so there\'s about 4 seats left!',
+		]
 		closed_responses = [
 			'Well there would be seats open, but we\'re closed',
+			'Closed. Rip',
+			'Wait, every single chair is empty?! Oh we\'re closed',
 		]
 
 		# Attempt to read history
@@ -106,26 +113,29 @@ if __name__ == '__main__':
 		except:
 			prev_responses = []
 
-		# Post a closed message at 10pm
 		now = datetime.datetime.now()
-		if now.hour == 22:
-			next_response = random.choice(closed_responses)
-			send_tweet(next_response)
-			write_to_log(prev_responses, next_response)
-		# Don't post again until 7am
-		elif (now.hour > 22) or (now.hour < 7):
+		# Exit if Greyhouse is closed
+		if (now.hour > 22) or (now.hour < 7):
 			print('Greyhouse is closed, and a closed message should have already been sent. Not sending tweet.')
+			exit()
+
+		# Post an opened message at 7am
+		if now.hour == 7:
+			next_response = random.choice(opened_responses)
+		# Post a closed message at 10pm
+		elif now.hour == 22:
+			next_response = random.choice(closed_responses)
 		# Normal tweet
 		else:
 			# Remove previous responses from options
 			for item in prev_responses:
 				if item in responses:
 					responses.remove(item)
-
-			# Get the next reponse
 			next_response = random.choice(responses)
-			send_tweet(next_response)
-			write_to_log(prev_responses, next_response)
+		
+		# Tweet and log
+		send_tweet(next_response)
+		write_to_log(prev_responses, next_response)
 	except Exception as ex:
 		# Pushover alert if something goes wrong
 		if use_pushover:
