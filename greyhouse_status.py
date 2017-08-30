@@ -41,14 +41,16 @@ def get_responses():
 		'Lol',
 		'Really slow right now, tons of seats. Haha in your dreams',
 		'Guess you\'re gettin it to go',
-		'Nope, the same 20 people have been here for the past hour, probably are\'nt leaving soon',
+		'Nope, the same 20 people have been here for the past hour, probably aren\'t leaving soon',
 		'If you\'re willing to throw elbows, tons!',
 		'No seats available until 10pm!',
 		'Current wait time: TBD',
 		'$7 for a cup of coffee, and you can\'t even sit down...',
 	]
 	# Add media as responses
-	responses += get_files_in_folder('./media')
+	# Get the path of this file, since running an exterior shell command will look in a different media folder
+	media_folder = './media' #os.path.join(os.path.dirname(os.path.realpath(__file__)), 'media')
+	responses += get_files_in_folder(media_folder)
 	return responses
 
 def get_files_in_folder(folder):
@@ -73,7 +75,8 @@ def send_tweet(string):
 			status = api.update_status(string)
 		print('Tweet "{}" sent at {}'.format(string, status.created_at))
 	except tweepy.TweepError as ex:
-		raise Exception('Tweet could not be sent. Error below:\n{}'.format(ex))
+		if ex.message[0]['code'] != 187: # Duplicate status/tweet
+			raise Exception('Tweet "{}" could not be sent. Error below:\n{}'.format(string, ex))
 
 def write_to_log(old_log_arr, new_text):
 	# Only keep a limited amount of history in the log
@@ -84,7 +87,8 @@ def write_to_log(old_log_arr, new_text):
 		log_data = [new_text] + old_log_arr
 
 	# Write to log 
-	with open('greyhouse_status.log', 'w') as out:
+	log_file = 'greyhouse_status.log' #os.path.join(os.path.dirname(os.path.realpath(__file__)), 'greyhouse_status.log')
+	with open(log_file, 'w') as out:
 		out.write('# Last three responses (newest first)\n')
 		out.write('\n'.join(log_data))
 
@@ -104,12 +108,12 @@ if __name__ == '__main__':
 
 		# Post a closed message at 10pm
 		now = datetime.datetime.now()
-		if now.hour == 20:
+		if now.hour == 22:
 			next_response = random.choice(closed_responses)
 			send_tweet(next_response)
 			write_to_log(prev_responses, next_response)
 		# Don't post again until 7am
-		elif (now.hour > 20) or (now.hour < 7):
+		elif (now.hour > 22) or (now.hour < 7):
 			print('Greyhouse is closed, and a closed message should have already been sent. Not sending tweet.')
 		# Normal tweet
 		else:

@@ -1,0 +1,12 @@
+--2017-08-29 19:25:37--  https://media3.giphy.com/media/f9sZHUqcy7cJ2/200w.webp
+Resolving media3.giphy.com... 151.101.186.2
+Connecting to media3.giphy.com|151.101.186.2|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 64958 (63K) [image/webp]
+Saving to: “200w.webp.3”
+
+     0K .......... .......... .......... .......... .......... 78% 3.89M 0s
+    50K .......... ...                                        100%  227M=0.01s
+
+2017-08-29 19:25:37 (4.92 MB/s) - “200w.webp.3” saved [64958/64958]
+
