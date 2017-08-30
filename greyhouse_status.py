@@ -1,9 +1,10 @@
 import tweepy
 import pushover
 import random
-import datetime
 import time
 import os
+from datetime import datetime, timedelta
+from dateutil import tz
 
 # Validate that Twitter API keys can be imported
 try:
@@ -76,8 +77,8 @@ def get_files_in_folder(folder):
 	'''Returns an array of filenames directly under folder'''
 	return [os.path.join(folder, f) for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
 
-def send_tweet(string):
-	'''Sends a tweet with media if the string is a valid file path, sends the string as a tweet otherwise'''
+def get_connection():
+	'''Returns an authenticated Tweepy API object'''
 	auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 	auth.set_access_token(ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET)
 	api = tweepy.API(auth)
@@ -85,7 +86,11 @@ def send_tweet(string):
 	# Validate keys
 	if not api.verify_credentials():
 		raise IOError('Twitter API keys are invalid')
-	
+	return api
+
+def send_tweet(string):
+	'''Sends a tweet with media if the string is a valid file path, sends the string as a tweet otherwise'''
+	api = get_connection()	
 	# Send tweet
 	try:
 		if os.path.isfile(string):
@@ -122,7 +127,7 @@ def hourly_tweet():
 	except:
 		prev_tweets = []
 
-	now = datetime.datetime.now()
+	now = datetime.now()
 	# Exit if Greyhouse is closed
 	if (now.hour > 22) or (now.hour < 7):
 		print('Greyhouse is closed, and a closed message should have already been sent. Not sending tweet.')
@@ -147,9 +152,28 @@ def hourly_tweet():
 	send_tweet(next_tweet)
 	write_to_log(prev_tweets, next_tweet)
 
+def retweet_from_last_minutes(user, mins):
+	'''Retweets a random tweet from user in the past minutes'''
+	api = get_connection()
+	timeline = api.user_timeline(user, count=20)
+
+	# Get only tweets that have been posted in the last hour
+	recent_tweets = []
+	hour_ago = datetime.now(tz=tz.tzlocal()) - timedelta(seconds=mins*60)
+	for tweet in timeline:
+		# Convert utc time to local
+		tweet_time = tweet.created_at.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
+		if tweet_time > hour_ago:
+			recent_tweets.append(tweet)
+	
+	if recent_tweets:
+		tweet = random.choice(recent_tweets)
+		api.retweet(tweet.id)
+
 if __name__ == '__main__':
 	try:
 		hourly_tweet()
+		retweet_from_past_minutes('PurdueCaboose', 30) # < 1 hr so that it's never retweeted twice
 	except Exception as ex:
 		# Pushover alert if something goes wrong
 		if use_pushover:
