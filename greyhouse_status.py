@@ -18,16 +18,21 @@ except ImportError:
 	use_pushover = False
 
 def get_responses():
+	'''Returns all "normal" responses, both text and media'''
 	# Text responses
 	responses = [
 		'No.',
 		'Nope.',
 		'Nah fam',
 		'Lol nope',
+		'Lol nope 😂',
 		'Hell nah',
 		'Hell no',
 		'HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA no',
 		'Bitch you thought',
+		'You wish',
+		'Keep dreaming',
+		'Every table\'s taken, sry bb',
 		'Maybe? Like 1 or 2?',
 		'*Rolls dice* ...Nope',
 		'Don\'t even bother.',
