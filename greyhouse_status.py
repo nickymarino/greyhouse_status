@@ -173,7 +173,7 @@ def retweet_from_last_minutes(user, mins):
 if __name__ == '__main__':
 	try:
 		hourly_tweet()
-		retweet_from_past_minutes('PurdueCaboose', 30) # < 1 hr so that it's never retweeted twice
+		retweet_from_last_minutes('PurdueCaboose', 30) # < 1 hr so that it's never retweeted twice
 	except Exception as ex:
 		# Pushover alert if something goes wrong
 		if use_pushover:
