@@ -1,7 +1,10 @@
 # greyhouse_status
 This is the code used to run [@GreyhouseStatus](https://twitter.com/greyhousestatus), a satiric Twitter bot that posts hourly "live" updates on the capacity of a coffee shop in West Lafayette, Purdue. The bot also retweets a few other Twitter accounts occasionally. The bot can also be configured to send Pushover notifications to a user whenever a Python exception is thrown.
 
+## Modifications
 The bot is configured so that more features can be added easily in the main section, so that in the future more "intelligence" and complexity can be added without much pain.
+
+More tweet options can be added to the arrays in `get_responses()`, and pictures/gifs (**not** mp4s) can also be added under the media folder.
 
 ## Setup
 ### Twitter API Keys
