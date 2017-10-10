@@ -104,7 +104,7 @@ def send_tweet(string):
 
 def write_to_log(old_log_arr, new_text):
 	# Only keep a limited amount of history in the log
-	num_responses_stored = 10
+	num_responses_stored = 20
 	if len(old_log_arr) >= num_responses_stored:
 		log_data = [new_text] + old_log_arr[0:(num_responses_stored-1)]
 	else:
@@ -133,8 +133,8 @@ def hourly_tweet():
 		print('Greyhouse is closed, and a closed message should have already been sent. Not sending tweet.')
 		exit()
 
-	# Post an opened message at 7am
-	if now.hour == 7:
+	# Post an opened message at 8am
+	if now.hour == 8:
 		possible_tweets = tweets['opened']
 	# Post a closed message at 10pm
 	elif now.hour == 22:
