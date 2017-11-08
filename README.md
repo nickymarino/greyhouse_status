@@ -18,7 +18,7 @@ ACCESS_TOKEN_SECRET = <secret as string>
 which you can get from the [Twitter App Creation Site](https://apps.twitter.com/app/new)
 
 ### Pushover API Keys
-In addition, for Pushover notifications, create a file `pushover_keys.py` in the same directory in the form:
+In addition, for Pushover notifications if an error occurs, create a file `pushover_keys.py` in the same directory in the form:
 ```
 PUSHOVER_USER = <user as string>
 PUSHOVER_APP_TOKEN = <token as string>
