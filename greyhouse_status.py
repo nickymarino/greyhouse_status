@@ -55,6 +55,17 @@ def get_responses():
 		'No seats available until 10pm!',
 		'Current wait time: TBD',
 		'$7 for a cup of coffee, and you can\'t even sit down...',
+		'Even with 280 characters, there\'s still not enough room here.',
+		'Lolz you wish, scrub',
+		'What do you think?\n\n\n...no',
+		'Bitch you wish',
+		'All I want for Christmas is a seat at Greyhouse',
+		'IU SUCKS!\n\n...And Greyhouse is still full',
+		('.\n' * 200) + '...no seats open.',
+		'Shoulda gotten here earlier, scrub',
+		'😂😂😂😂😂',
+		'absolutely not :(',
+		'Game over. Please insert coin.',
 	] + get_files_in_folder('./media')
 	
 	# Responses when the store is closed
@@ -104,7 +115,7 @@ def send_tweet(string):
 
 def write_to_log(old_log_arr, new_text):
 	# Only keep a limited amount of history in the log
-	num_responses_stored = 20
+	num_responses_stored = 30
 	if len(old_log_arr) >= num_responses_stored:
 		log_data = [new_text] + old_log_arr[0:(num_responses_stored-1)]
 	else:
