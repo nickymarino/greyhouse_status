@@ -66,6 +66,15 @@ def get_responses():
 		'😂😂😂😂😂',
 		'absolutely not :(',
 		'Game over. Please insert coin.',
+		'Eventually maybe',
+		'Honestly, just go to Vienna. They have seats.',
+		'Lolololol',
+		'Just sit on someone else',
+		'Somehow WALC has more seats',
+		'Not gonna happen, bud',
+		'Just give up',
+		'They\'re not even open right now!',
+		'Standing room only',
 	] + get_files_in_folder('./media')
 	
 	# Responses when the store is closed
@@ -115,7 +124,7 @@ def send_tweet(string):
 
 def write_to_log(old_log_arr, new_text):
 	# Only keep a limited amount of history in the log
-	num_responses_stored = 30
+	num_responses_stored = 50
 	if len(old_log_arr) >= num_responses_stored:
 		log_data = [new_text] + old_log_arr[0:(num_responses_stored-1)]
 	else:
